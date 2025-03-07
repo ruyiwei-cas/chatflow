@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中科院自动化研究所（先导项目） 流程图识别</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a5fb4;
+            --primary-light: #3584e4;
+            --primary-dark: #15437e;
+            --secondary-color: #f6f9fc;
+            --border-color: #dce1e6;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #fff;
+            --success-color: #2eb85c;
+            --warning-color: #f9b115;
+            --danger-color: #e55353;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+
+        .chat-container {
+            background-color: var(--bg-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            width: 100%;
+            overflow: hidden;
+            flex: 1;
+            transition: var(--transition-normal);
+        }
+
+        .chat-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .chat-header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            background-color: var(--primary-light);
+        }
+
+        .ai-avatar {
+            background-color: #6c757d;
+        }
+
+        .message-content {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+            max-width: 85%;
+            align-self: flex-start;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+        }
+
+        .message-content:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-message .message-content {
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: var(--radius-md) 0 var(--radius-md) var(--radius-md);
+            align-self: flex-end;
+        }
+
+        .user-message {
+            align-items: flex-end;
+        }
+
+        .user-message .message-header {
+            flex-direction: row-reverse;
+        }
+
+        .user-message .message-avatar {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+
+        .message-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: var(--radius-md);
+            margin-top: 10px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .input-container {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .image-upload-button {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            transition: var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .image-upload-button:hover {
+            background-color: rgba(26, 95, 180, 0.1);
+        }
+
+        .image-upload-button i {
+            margin-right: 5px;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            overflow-y: auto;
+            transition: var(--transition-fast);
+            font-family: var(--font-family);
+        }
+
+        .message-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.15);
+        }
+
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-light);
+            border-radius: 50%;
+            margin: 0 2px;
+            opacity: 0.5;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        .mermaid {
+            margin: 20px 0;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+        }
+
+        .mermaid:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .mermaid-error {
+            color: var(--danger-color);
+            font-size: 14px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background-color: rgba(229, 83, 83, 0.1);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--danger-color);
+        }
+
+        .diagram-container {
+            margin: 20px 0;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+        }
+
+        .diagram-container:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .clear-button {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clear-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        .code-edit-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-edit-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .code-edit-area {
+            width: 100%;
+            min-height: 180px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: var(--transition-fast);
+        }
+
+        .code-edit-area:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.15);
+        }
+
+        .mermaid-fixed {
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .fix-diagram-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fix-diagram-button:hover {
+            background-color: #269d4e;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 140px);
+            }
+            
+            .chat-header h1 {
+                font-size: 1rem;
+            }
+            
+            .message-content {
+                max-width: 90%;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+        }
+
+        /* Icon styles */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="./logo.png" alt="中科院自动化研究所logo" class="logo">
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>中科院自动化研究所（先导项目） 流程图识别</h1>
+                <button class="clear-button" id="clearChat">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    清空对话
+                </button>
+            </div>
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages will be displayed here -->
+            </div>
+            <div class="input-container">
+                <div class="controls">
+                    <label class="image-upload-button tooltip">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.5 10C9.32843 10 10 9.32843 10 8.5C10 7.67157 9.32843 7 8.5 7C7.67157 7 7 7.67157 7 8.5C7 9.32843 7.67157 10 8.5 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        上传图片
+                        <span class="tooltiptext">上传流程图图片进行识别</span>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;" multiple>
+                    </label>
+                </div>
+                <div id="thumbnailContainer" class="thumbnail-container"></div>
+                <div class="textarea-wrapper">
+                    <textarea class="message-input" id="messageInput" placeholder="输入您的消息或上传流程图图片..." rows="1"></textarea>
+                    <button class="send-button" id="sendMessage">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        © 2025 中国科学院自动化研究所 - 流程图识别系统
+    </div>
+    
+    <!-- Modal for image preview -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="closeModal">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="放大图片">
+        </div>
+    </div>
+
+    <script>
+        // 配置Mermaid
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeCSS: '.node rect { fill: #f0f6ff; stroke: #1a5fb4; } .edgeLabel { background-color: #fff; } .edgePath .path { stroke: #1a5fb4; stroke-width: 2px; } .cluster rect { fill: #f9f9f9; stroke: #ddd; }',
+            flowchart: { 
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            logLevel: 'error'
+        });
+
+        // DOM Elements
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendMessage');
+        const imageUpload = document.getElementById('imageUpload');
+        const thumbnailContainer = document.getElementById('thumbnailContainer');
+        const clearChatButton = document.getElementById('clearChat');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+
+        // State variables
+        let messageHistory = [];
+        let uploadedImages = [];
+        let isWaitingForResponse = false;
+        // 固定使用的API Key
+        const apiKey = "sk-da2223ca3f6148aeb62fbf21d26e0a0f";
+        const modelName = "qwen-omni-turbo";
+        let mermaidDiagramCounter = 0;
+
+        // 常见的Mermaid语法错误修复模板
+        const mermaidFixTemplates = {
+            // 移除多余的空行和空格
+            cleanWhitespace: (code) => code.trim().replace(/\n\s*\n/g, '\n'),
+            
+            // 修复flowchart方向
+            fixFlowchartDirection: (code) => {
+                if (code.match(/^flowchart\s*$/m)) {
+                    return code.replace(/^flowchart\s*$/m, 'flowchart TD');
+                }
+                return code;
+            },
+            
+            // 修复没有定义节点的链接
+            fixUndefinedNodes: (code) => {
+                const nodeLinks = code.match(/([A-Za-z0-9_-]+)\s*-->\s*([A-Za-z0-9_-]+)/g) || [];
+                const definedNodes = new Set();
+                const regex = /([A-Za-z0-9_-]+)(?:\[|{|>|\()/g;
+                let match;
+                while ((match = regex.exec(code)) !== null) {
+                    definedNodes.add(match[1]);
+                }
+                
+                let fixedCode = code;
+                for (const link of nodeLinks) {
+                    const [_, source, target] = link.match(/([A-Za-z0-9_-]+)\s*-->\s*([A-Za-z0-9_-]+)/) || [];
+                    if (source && !definedNodes.has(source)) {
+                        fixedCode = fixedCode.replace(new RegExp(`\\b${source}\\b\\s*-->`, 'g'), `${source}[${source}] -->`);
+                    }
+                    if (target && !definedNodes.has(target)) {
+                        fixedCode = fixedCode.replace(new RegExp(`-->\\s*\\b${target}\\b`, 'g'), `--> ${target}[${target}]`);
+                    }
+                }
+                return fixedCode;
+            },
+            
+            // 添加基本的flowchart结构
+            addFlowchartStructure: (code) => {
+                if (!code.trim().startsWith('flowchart') && !code.trim().startsWith('graph')) {
+                    return `flowchart TD\n${code}`;
+                }
+                return code;
+            },
+            
+            // 常见错误符号替换
+            fixSymbols: (code) => {
+                return code
+                    .replace(/：/g, ':')  // 中文冒号替换为英文冒号
+                    .replace(/；/g, ';')  // 中文分号替换为英文分号
+                    .replace(/，/g, ',')  // 中文逗号替换为英文逗号
+                    .replace(/（/g, '(')  // 中文括号替换为英文括号
+                    .replace(/）/g, ')')  // 中文括号替换为英文括号
+                    .replace(/"|"/g, '"') // 中文引号替换为英文引号
+                    .replace(/【/g, '[')  // 中文方括号替换为英文方括号
+                    .replace(/】/g, ']')  // 中文方括号替换为英文方括号
+                    .replace(/——/g, '--') // 中文破折号替换为英文破折号
+            }
+        };
+
+        // 尝试修复Mermaid语法
+        function fixMermaidSyntax(code) {
+            let fixedCode = code;
+            
+            // 应用所有修复模板
+            Object.values(mermaidFixTemplates).forEach(fix => {
+                fixedCode = fix(fixedCode);
+            });
+            
+            // 确保代码以花括号方式定义节点，而不是用节点名称直接赋值
+            const lines = fixedCode.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                // 匹配 "nodeId: text" 格式但不是已正确格式化的节点定义
+                if (/^[A-Za-z0-9_-]+\s*:.+$/.test(lines[i]) && !/^[A-Za-z0-9_-]+\s*\[.+\]/.test(lines[i])) {
+                    const [nodeId, text] = lines[i].split(':', 2);
+                    lines[i] = `${nodeId.trim()}["${text.trim()}"]`;
+                }
+            }
+            
+            return lines.join('\n');
+        }
+
+        // 验证Mermaid语法
+        async function validateMermaidSyntax(code) {
+            try {
+                await mermaid.parse(code);
+                return { valid: true };
+            } catch (error) {
+                console.error("Mermaid parsing error:", error);
+                return { 
+                    valid: false, 
+                    error: error.message || "语法错误" 
+                };
+            }
+        }
+
+        // 创建可编辑的Mermaid图表元素
+        function createEditableMermaidElement(code, containerId) {
+            const container = document.createElement('div');
+            container.id = containerId;
+            container.classList.add('diagram-container');
+            
+            // 添加Mermaid图表
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.classList.add('mermaid');
+            mermaidDiv.textContent = code;
+            container.appendChild(mermaidDiv);
+            
+            // 添加编辑按钮
+            const editButton = document.createElement('button');
+            editButton.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                修复流程图
+            `;
+            editButton.classList.add('code-edit-button');
+            editButton.onclick = async function() {
+                // 切换到编辑模式
+                if (!container.querySelector('.code-edit-area')) {
+                    const textarea = document.createElement('textarea');
+                    textarea.classList.add('code-edit-area');
+                    textarea.value = code;
+                    container.appendChild(textarea);
+                    
+                    const buttonGroup = document.createElement('div');
+                    buttonGroup.classList.add('button-group');
+                    
+                    const applyButton = document.createElement('button');
+                    applyButton.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        应用修复
+                    `;
+                    applyButton.classList.add('fix-diagram-button');
+                    applyButton.onclick = async function() {
+                        const newCode = textarea.value;
+                        const validation = await validateMermaidSyntax(newCode);
+                        
+                        if (validation.valid) {
+                            // 更新图表
+                            mermaidDiv.textContent = newCode;
+                            mermaidDiv.removeAttribute('data-processed');
+                            
+                            // 移除编辑区域
+                            container.removeChild(textarea);
+                            container.removeChild(buttonGroup);
+                            
+                            // 重新渲染
+                            await mermaid.init(undefined, mermaidDiv);
+                            
+                            // 移除错误信息（如果存在）
+                            const errorElem = container.querySelector('.mermaid-error');
+                            if (errorElem) container.removeChild(errorElem);
+                        } else {
+                            // 显示错误
+                            let errorElem = container.querySelector('.mermaid-error');
+                            if (!errorElem) {
+                                errorElem = document.createElement('div');
+                                errorElem.classList.add('mermaid-error');
+                                container.appendChild(errorElem);
+                            }
+                            errorElem.textContent = `语法错误: ${validation.error}`;
+                        }
+                    };
+                    
+                    const autoFixButton = document.createElement('button');
+                    autoFixButton.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 13V19C18 19.5304 17.7893 20.0391 17.4142 20.4142C17.0391 20.7893 16.5304 21 16 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V8C3 7.46957 3.21071 6.96086 3.58579 6.58579C3.96086 6.21071 4.46957 6 5 6H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 3H21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        自动修复
+                    `;
+                    autoFixButton.classList.add('fix-diagram-button');
+                    autoFixButton.style.backgroundColor = '#f9b115';
+                    autoFixButton.onclick = async function() {
+                        const fixedCode = fixMermaidSyntax(textarea.value);
+                        textarea.value = fixedCode;
+                        
+                        // 尝试验证修复后的代码
+                        const validation = await validateMermaidSyntax(fixedCode);
+                        if (validation.valid) {
+                            // 如果验证通过，自动应用
+                            mermaidDiv.textContent = fixedCode;
+                            mermaidDiv.removeAttribute('data-processed');
+                            
+                            // 移除编辑区域
+                            container.removeChild(textarea);
+                            container.removeChild(buttonGroup);
+                            
+                            // 重新渲染
+                            await mermaid.init(undefined, mermaidDiv);
+                            
+                            // 移除错误信息（如果存在）
+                            const errorElem = container.querySelector('.mermaid-error');
+                            if (errorElem) container.removeChild(errorElem);
+                        } else {
+                            // 显示错误，但保留修复后的代码供用户继续编辑
+                            let errorElem = container.querySelector('.mermaid-error');
+                            if (!errorElem) {
+                                errorElem = document.createElement('div');
+                                errorElem.classList.add('mermaid-error');
+                                container.appendChild(errorElem);
+                            }
+                            errorElem.textContent = `自动修复后仍有语法错误: ${validation.error}。请手动编辑。`;
+                        }
+                    };
+                    
+                    const cancelButton = document.createElement('button');
+                    cancelButton.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        取消
+                    `;
+                    cancelButton.classList.add('fix-diagram-button');
+                    cancelButton.style.backgroundColor = '#6c757d';
+                    cancelButton.onclick = function() {
+                        container.removeChild(textarea);
+                        container.removeChild(buttonGroup);
+                    };
+                    
+                    buttonGroup.appendChild(autoFixButton);
+                    buttonGroup.appendChild(applyButton);
+                    buttonGroup.appendChild(cancelButton);
+                    container.appendChild(buttonGroup);
+                }
+            };
+            container.appendChild(editButton);
+            
+            return container;
+        }
+
+        // 图片预览模态框
+        function setupImagePreview() {
+            // 点击图片打开模态框
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('message-image')) {
+                    modalImage.src = e.target.src;
+                    imageModal.style.display = 'flex';
+                }
+            });
+            
+            // 关闭模态框
+            closeModal.addEventListener('click', function() {
+                imageModal.style.display = 'none';
+            });
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    imageModal.style.display = 'none';
+                }
+            });
+            
+            // ESC键关闭
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageModal.style.display === 'flex') {
+                    imageModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto resize textarea
+        messageInput.addEventListener('input', () => {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+        });
+
+        // Handle image uploads
+        imageUpload.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (files.length > 0) {
+                thumbnailContainer.innerHTML = '';
+                uploadedImages = [];
+                
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const base64Image = e.target.result;
+                        uploadedImages.push({
+                            data: base64Image,
+                            file: file
+                        });
+                        
+                        // Create thumbnail
+                        const thumbnail = document.createElement('img');
+                        thumbnail.classList.add('thumbnail');
+                        thumbnail.src = base64Image;
+                        thumbnail.title = file.name;
+                        thumbnailContainer.appendChild(thumbnail);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Send message function
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Clear chat function
+        clearChatButton.addEventListener('click', () => {
+            // 添加确认
+            if (confirm('确定要清空所有对话吗？')) {
+                messagesContainer.innerHTML = '';
+                messageHistory = [];
+                mermaidDiagramCounter = 0;
+                // 重新添加欢迎消息
+                initialize();
+            }
+        });
+
+        async function sendMessage() {
+            if (isWaitingForResponse) return;
+            
+            const message = messageInput.value.trim();
+            
+            // 检查是否有消息或图片上传
+            if (!message && uploadedImages.length === 0) return;
+
+            // Add user message to UI
+            addMessageToUI('user', message, uploadedImages);
+            
+            // Prepare for API request
+            const content = [];
+            
+            // Add images if any
+            if (uploadedImages.length > 0) {
+                for (const image of uploadedImages) {
+                    content.push({
+                        type: "image_url",
+                        image_url: {
+                            url: image.data
+                        }
+                    });
+                }
+            }
+            
+            // Add text if any
+            if (message) {
+                content.push({
+                    type: "text",
+                    text: message
+                });
+            }
+
+            // Add the user message to history
+            messageHistory.push({
+                role: "user",
+                content: content
+            });
+
+            // Reset input and thumbnail
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            thumbnailContainer.innerHTML = '';
+            uploadedImages = [];
+
+            // Add AI typing indicator
+            const aiMessage = document.createElement('div');
+            aiMessage.classList.add('message');
+            
+            const messageHeader = document.createElement('div');
+            messageHeader.classList.add('message-header');
+            
+            const messageAvatar = document.createElement('div');
+            messageAvatar.classList.add('message-avatar', 'ai-avatar');
+            messageAvatar.textContent = 'AI';
+            
+            messageHeader.appendChild(messageAvatar);
+            aiMessage.appendChild(messageHeader);
+            
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('typing-indicator');
+            typingIndicator.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            
+            messageContent.appendChild(typingIndicator);
+            aiMessage.appendChild(messageContent);
+            
+            messagesContainer.appendChild(aiMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            isWaitingForResponse = true;
+            
+            try {
+                // Prepare the request messages
+                const messages = [...messageHistory];
+                // Add system message if not already present
+                if (!messages.some(msg => msg.role === "system")) {
+                    messages.unshift({
+                        role: "system",
+                        content: [
+                            {
+                                type: "text",
+                                text: "你是一个流程图识别专家，当用户上传包含流程图的图片时，请分析并使用Mermaid语法重新构建流程图。请先描述一下你看到的图片内容，然后提供Mermaid流程图代码。你的Mermaid代码必须严格遵循Mermaid 10.8.0的语法规范，确保能被正确渲染。使用flowchart关键字而不是graph关键字，确保指定方向(如TD、LR等)，并确保所有节点都被正确定义。如果图片不是流程图，请礼貌告知用户并提供其他帮助。"
+                            }
+                        ]
+                    });
+                }
+                
+                // Call the API
+                const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: modelName,
+                        messages: messages,
+                        stream: true,
+                        stream_options: {
+                            include_usage: true
+                        },
+                        modalities: ["text"]
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'API请求失败');
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let responseText = '';
+                
+                // Replace typing indicator with actual content
+                messageContent.innerHTML = '';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n').filter(line => line.trim() !== '');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            
+                            try {
+                                const parsedData = JSON.parse(data);
+                                if (parsedData.choices && parsedData.choices[0]?.delta?.content) {
+                                    const content = parsedData.choices[0].delta.content;
+                                    responseText += content;
+                                    
+                                    // 处理内容，但暂不渲染Mermaid
+                                    messageContent.innerHTML = processMessageContent(responseText, false);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing streaming data:', e);
+                            }
+                        }
+                    }
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+                
+                // 完整响应后处理Mermaid图表
+                messageContent.innerHTML = '';
+                const processedText = await processAndRenderMermaid(responseText);
+                messageContent.innerHTML = processedText;
+                
+                // Add the AI response to message history
+                messageHistory.push({
+                    role: "assistant",
+                    content: [
+                        {
+                            type: "text",
+                            text: responseText
+                        }
+                    ]
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageContent.innerHTML = `<div style="color: #dc3545;">错误: ${error.message}</div>`;
+            } finally {
+                isWaitingForResponse = false;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function addMessageToUI(role, text, images = []) {
+            const message = document.createElement('div');
+            message.classList.add('message');
+            
+            if (role === 'user') {
+                message.classList.add('user-message');
+            }
+            
+            const messageHeader = document.createElement('div');
+            messageHeader.classList.add('message-header');
+            
+            const messageAvatar = document.createElement('div');
+            messageAvatar.classList.add('message-avatar');
+            messageAvatar.textContent = role === 'user' ? '用户' : 'AI';
+            
+            if (role === 'user') {
+                messageAvatar.classList.add('user-avatar');
+            } else {
+                messageAvatar.classList.add('ai-avatar');
+            }
+            
+            messageHeader.appendChild(messageAvatar);
+            message.appendChild(messageHeader);
+            
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            
+            // Add images if any
+            if (images && images.length > 0) {
+                for (const image of images) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = image.data;
+                    imgElement.classList.add('message-image');
+                    imgElement.title = "点击查看大图";
+                    messageContent.appendChild(imgElement);
+                }
+            }
+            
+            // Add text if any
+            if (text) {
+                const textElement = document.createElement('div');
+                textElement.innerHTML = text;
+                messageContent.appendChild(textElement);
+            }
+            
+            message.appendChild(messageContent);
+            messagesContainer.appendChild(message);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function processMessageContent(text, renderMermaid = true) {
+            // 处理代码块和Mermaid图表
+            let processedText = text;
+            
+            // 处理带有语言说明的代码块
+            if (renderMermaid) {
+                processedText = processedText.replace(/```([\w-]*)\n([\s\S]*?)\n```/g, (match, language, code) => {
+                    if (language.toLowerCase() === 'mermaid') {
+                        return `<div class="mermaid-placeholder" data-code="${encodeURIComponent(code.trim())}"></div>`;
+                    } else {
+                        return `<pre><code class="language-${language}">${code.trim()}</code></pre>`;
+                    }
+                });
+            } else {
+                processedText = processedText.replace(/```([\w-]*)\n([\s\S]*?)\n```/g, (match, language, code) => {
+                    return `<pre><code class="language-${language}">${code.trim()}</code></pre>`;
+                });
+            }
+            
+            // 处理内联代码
+            processedText = processedText.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // 处理换行
+            processedText = processedText.replace(/\n/g, '<br>');
+            
+            return processedText;
+        }
+
+        async function processAndRenderMermaid(text) {
+            // 找出所有的Mermaid代码块
+            const mermaidMatches = text.match(/```mermaid\n([\s\S]*?)\n```/g) || [];
+            let processedText = text;
+
+            for (const match of mermaidMatches) {
+                const code = match.replace(/```mermaid\n([\s\S]*?)\n```/g, '$1').trim();
+                
+                // 创建一个唯一的容器ID
+                const containerId = `mermaid-diagram-${mermaidDiagramCounter++}`;
+                
+                // 替换原始代码块
+                processedText = processedText.replace(match, `<div id="${containerId}-placeholder"></div>`);
+                
+                // 验证并尝试修复Mermaid语法
+                let fixedCode = fixMermaidSyntax(code);
+                const validation = await validateMermaidSyntax(fixedCode);
+                
+                // 延迟添加Mermaid元素
+                setTimeout(() => {
+                    const placeholder = document.getElementById(`${containerId}-placeholder`);
+                    if (placeholder) {
+                        const container = createEditableMermaidElement(fixedCode, containerId);
+                        placeholder.parentNode.replaceChild(container, placeholder);
+                        
+                        // 尝试渲染Mermaid图表
+                        const mermaidDiv = container.querySelector('.mermaid');
+                        if (validation.valid) {
+                            mermaid.init(undefined, mermaidDiv).catch(err => {
+                                console.error('Mermaid init error:', err);
+                                const errorElem = document.createElement('div');
+                                errorElem.classList.add('mermaid-error');
+                                errorElem.textContent = `渲染错误: ${err.message || '未知错误'}`;
+                                container.appendChild(errorElem);
+                            });
+                        } else {
+                            const errorElem = document.createElement('div');
+                            errorElem.classList.add('mermaid-error');
+                            errorElem.textContent = `语法错误: ${validation.error}。请点击"修复流程图"按钮尝试修复。`;
+                            container.appendChild(errorElem);
+                        }
+                    }
+                }, 100);
+            }
+            
+            // 处理其他非Mermaid内容
+            return processMessageContent(processedText, false).replace(/<div class="mermaid-placeholder" data-code="([^"]+)"><\/div>/g, (match, encodedCode) => {
+                const code = decodeURIComponent(encodedCode);
+                const containerId = `mermaid-diagram-${mermaidDiagramCounter++}`;
+                return `<div id="${containerId}-placeholder"></div>`;
+            });
+        }
+
+        // 添加动画效果
+        function addScrollAnimation() {
+            const messages = document.querySelectorAll('.message');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            messages.forEach(message => {
+                observer.observe(message);
+            });
+        }
+
+        // Initialize
+        function initialize() {
+            // Set initial message
+            addMessageToUI('assistant', '您好！我是流程图识别助手。您可以上传包含流程图的图片，我会分析并使用Mermaid语法重新构建流程图。请上传您想要识别的流程图图片，或告诉我您需要什么帮助。');
+            
+            // 设置图片预览功能
+            setupImagePreview();
+            
+            // Focus on input
+            messageInput.focus();
+        }
+
+        // 页面加载完成
+        window.addEventListener('load', () => {
+            initialize();
+        });
+    </script>
+</body>
+</html>
